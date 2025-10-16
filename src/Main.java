@@ -1,9 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -11,25 +8,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
         public class Main {
-            public static int num = 0;
             private static JFrame frame;
-            public static int charindx = 0;
 
             public static void main(String[] args) {
                 SwingUtilities.invokeLater(() -> new Main().createAndShowGUI());
             }
 
-            Action delete = new AbstractAction()
+            Action start = new AbstractAction()
             {
                 public void actionPerformed(ActionEvent e)
                 {
 
                     JTable table = (JTable)e.getSource();
                     DefaultTableModel model= (DefaultTableModel) table.getModel();
-                    int modelRow = Integer.valueOf( e.getActionCommand() );
+                    int modelRow = Integer.parseInt(e.getActionCommand());
                     String aircraft = (String) model.getValueAt(modelRow,0);
-                    Window window = SwingUtilities.windowForComponent(table);
-                    String s="";
                     MyRunnable thread = new MyRunnable(aircraft,model);
                     ExecutorService executorService = Executors.newFixedThreadPool(Integer.MAX_VALUE);
                     executorService.execute(thread);
@@ -38,24 +31,18 @@ import java.util.concurrent.Executors;
 
             };
 
-
-
-            public JButton getjButton(DefaultTableModel model,Aircraft aircraft ) {
-                JButton button = new JButton("Uruchom wątki");
-                button.addActionListener(e -> {
-
-                        String s="";
-                       MyRunnable thread = new MyRunnable(aircraft.getModel(),model);
-                        ExecutorService executorService = Executors.newFixedThreadPool(Integer.MAX_VALUE);
-                        executorService.execute(thread);
-
-                });
-                return button;
+            public static boolean isModelinarr(String model, ArrayList<Aircraft> planes) {
+                for (Aircraft aircraft : planes) {
+                    if (aircraft.getModel().equals(model)) {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             public JButton getjButton3(JTextField modelplane,JTextField capacityfield,JTextField speedfield,JRadioButton CargoPlane,JRadioButton PassangerPlane, DefaultTableModel model,ArrayList<Aircraft>planes ) {
                 JButton button = new JButton("Dodaj samolot");
-                button.addActionListener(e -> {
+                button.addActionListener(_ -> {
                   Vector <String> v = new Vector<>();
                   String mod=modelplane.getText();
                   int capacity=Integer.parseInt(capacityfield.getText());
@@ -63,32 +50,33 @@ import java.util.concurrent.Executors;
 
                   if(CargoPlane.isSelected()) {
                       CargoPlane cargoPlane=new CargoPlane(mod,capacity,speed);
-                      planes.add(cargoPlane);
-                      v.add(mod);
-                      v.add("CargoPlane");
-                      v.add("  ");
-                      v.add(" Wystartuj ");
-                      model.addRow(v);
+                      if (isModelinarr(mod, planes)) {
+                          System.out.println("Dany samolot istnieje");
+                      } else {
+                          planes.add(cargoPlane);
+                          v.add(mod);
+                          v.add("CargoPlane");
+                          v.add("  ");
+                          v.add("Startuj ");
+                          model.addRow(v);
+                      }
                   }
                   if(PassangerPlane.isSelected()) {
                       PassangerPlane passangerPlane=new PassangerPlane(mod,capacity,speed);
-                      planes.add(passangerPlane);
-                      v.add(mod);
-                      v.add("PassangerPlane");
-                      v.add(" ");
-                      v.add(" Wystartuj ");
-                      model.addRow(v);
+                      if (isModelinarr(mod, planes)) {
+                          System.out.println("Dany samolot istnieje");
+                      } else {
+                          planes.add(passangerPlane);
+                          v.add(mod);
+                          v.add("PassangerPlane");
+                          v.add(" ");
+                          v.add(" Wystartuj ");
+                          model.addRow(v);
+                      }
                   }
-               // MyRunnable thread= new MyRunnable(textField.getText(),model);
-
-
-
                 });
                 return button;
             }
-
-
-
 
             private  JButton getjButton1(DefaultTableModel model,ArrayList<Aircraft>planes ) {
                 JButton button = new JButton("Dodaj samolot");
@@ -112,7 +100,6 @@ import java.util.concurrent.Executors;
                     JButton button1 = getjButton3(textField,textField1,textField2,jRadioButton1,jRadioButton2, model,planes);
                     JButton button2 = getjButton2(frame1);
                    JLabel label = new JLabel("Podaj dane samolotu ( 1 typ, 2 pojemność, 3 prędkość): ");
-                   // basicPanel.add(label);
                     Box box = Box.createVerticalBox();
                     box.add(label);
 
@@ -135,7 +122,6 @@ import java.util.concurrent.Executors;
                 return button;
             }
 
-
             private void createAndShowGUI() {
                 frame = new JFrame("AirportApp");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -154,19 +140,14 @@ import java.util.concurrent.Executors;
                 model.addColumn("Akcja");
 
 
-
-                //JButton btn = getjButton(model,planes);
                 Box box = Box.createVerticalBox();
-               // basicPanel.add(btn);
                 JButton btn1 = getjButton1(model,planes);
-                // JButton btn1 = getjButton1(model, threads, label);
                 box.add(btn1);
-                //box.add(btn);
                 basicPanel.add(box);
                 frame.add(basicPanel, BorderLayout.EAST);
                 JTable table = new JTable();
                 table.setModel(model);
-                ButtonColumn buttonColumn = new ButtonColumn(table, delete, 3);
+                ButtonColumn buttonColumn = new ButtonColumn(table, start, 3);
                 JScrollPane tableScroll = new JScrollPane(table);
                 table.setRowHeight(100);
                 frame.add(tableScroll, BorderLayout.CENTER);
@@ -199,27 +180,27 @@ import java.util.concurrent.Executors;
                         String status="";
                         String modelsam="";
                         if(k==0){
-                            status="startuje";
+                            status = "startuje";
                         }
                         if(k==1){
-                            status="w locie";
+                            status = "w locie";
                         }
                         if(k==2){
-                            status="ląduje";
+                            status = "wylądował";
                         }
-                        int row=0;
-                        int col=0;
+                        int row = 0;
+                        int col = 0;
                         for (int i = 0; i < model.getRowCount(); i++) {
                             for (int j = 0; j < model.getColumnCount(); j++) {
                                 if (model.getValueAt(i, j).equals(threadName)) {
-                                    row=i;
-                                    col=j+2;
-                                    modelsam=model.getValueAt(i,0).toString();
+                                    row = i;
+                                    col = j + 2;
+                                    modelsam = model.getValueAt(i, 0).toString();
                                 }
                             }
                         }
                         model.setValueAt(status, row, col);
-                        System.out.println(modelsam+ ":"+status);
+                        System.out.println(modelsam + ":"+status);
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {

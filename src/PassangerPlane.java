@@ -1,4 +1,4 @@
-public class PassangerPlane extends Aircraft implements Flyable,Servicable {
+public class PassangerPlane extends Aircraft implements Flyable, Serviceable {
     public PassangerPlane(String model, int capacity, int speed) {
         super(model, capacity, speed);
     }
