@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
                       v.add("CargoPlane");
                       v.add("  ");
                       v.add(" ");
+                      model.addRow(v);
                   }
                   if(jRadioButton1.isSelected()) {
                       PassangerPlane passangerPlane=new PassangerPlane(mod,capacity,speed);
@@ -58,11 +59,12 @@ import java.util.concurrent.Executors;
                       v.add("PassangerPlane");
                       v.add(" ");
                       v.add(" ");
+                      model.addRow(v);
                   }
                // MyRunnable thread= new MyRunnable(textField.getText(),model);
 
 
-                  model.addRow(v);
+
                 });
                 return button;
             }
@@ -102,13 +104,6 @@ import java.util.concurrent.Executors;
                     box.add(jRadioButton1);
                     box.add(jRadioButton2);
                     basicPanel.add(box);
-                  //  basicPanel.add(textField);
-                   // basicPanel.add(button1);
-                  //  basicPanel.add(button2);
-                   // basicPanel.add(jRadioButton1);
-                   // basicPanel.add(jRadioButton2);
-                 //   basicPanel.add(textField1);
-                  //  basicPanel.add(textField2);
                     frame1.setVisible(true);
                 });
                 return button;
@@ -178,7 +173,17 @@ import java.util.concurrent.Executors;
                 }
                 @Override
                 public void run() {
-                    for (int k = 1; k <= 10; k++) {
+                    for (int k = 0; k <3 ; k++) {
+                        String s="";
+                        if(k==0){
+                            s="startuje";
+                        }
+                        if(k==1){
+                            s="w locie";
+                        }
+                        if(k==2){
+                            s="ląduje";
+                        }
                         int row=0;
                         int col=0;
                         for (int i = 0; i < model.getRowCount(); i++) {
@@ -189,9 +194,9 @@ import java.util.concurrent.Executors;
                                 }
                             }
                         }
-                        model.setValueAt(k, row, col);
+                        model.setValueAt(s, row, col);
                         try {
-                            Thread.sleep(300);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             System.out.println(threadName + " przerwany!");
                         }
