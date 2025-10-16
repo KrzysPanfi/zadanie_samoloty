@@ -173,16 +173,18 @@ import java.util.concurrent.Executors;
                 }
                 @Override
                 public void run() {
+
                     for (int k = 0; k <3 ; k++) {
-                        String s="";
+                        String status="";
+                        String modelsam="";
                         if(k==0){
-                            s="startuje";
+                            status="startuje";
                         }
                         if(k==1){
-                            s="w locie";
+                            status="w locie";
                         }
                         if(k==2){
-                            s="ląduje";
+                            status="ląduje";
                         }
                         int row=0;
                         int col=0;
@@ -191,10 +193,12 @@ import java.util.concurrent.Executors;
                                 if (model.getValueAt(i, j).equals(threadName)) {
                                     row=i;
                                     col=j+2;
+                                    modelsam=model.getValueAt(i,0).toString();
                                 }
                             }
                         }
-                        model.setValueAt(s, row, col);
+                        model.setValueAt(status, row, col);
+                        System.out.println(modelsam+ ":"+status);
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
