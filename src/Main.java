@@ -10,55 +10,119 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
         public class Main {
-            public static int num=0;
+            public static int num = 0;
             private static JFrame frame;
-            public static int charindx=0;
+            public static int charindx = 0;
+
             public static void main(String[] args) {
                 SwingUtilities.invokeLater(() -> new Main().createAndShowGUI());
             }
 
 
-            public static JButton getjButton(DefaultTableModel model,ArrayList<MyRunnable>threads ) {
+
+            public JButton getjButton(DefaultTableModel model,ArrayList<Aircraft>planes ) {
                 JButton button = new JButton("Uruchom wątki");
                 button.addActionListener(e -> {
-                    for(int i=0;i<threads.size();i++) {
+                    for(int i=0;i<planes.size();i++) {
 
                         String s="";
-                        MyRunnable thread = threads.get(i);
-                        thread = new MyRunnable(thread.getThreadName(),model);
-                        ExecutorService executorService = Executors.newFixedThreadPool(threads.size());
+                        Aircraft aircraft = planes.get(i);
+                       MyRunnable thread = new MyRunnable(aircraft.getModel(),model);
+                        ExecutorService executorService = Executors.newFixedThreadPool(planes.size());
                         executorService.execute(thread);
                     }
                 });
                 return button;
             }
 
-            public static JButton getjButton1(DefaultTableModel model, ArrayList<MyRunnable> threads, JLabel label) {
-                JButton button = new JButton("Dodaj wątek");
+            public JButton getjButton3(JTextField modelplane,JTextField capacityfield,JTextField speedfield,JRadioButton jRadioButton,JRadioButton jRadioButton1, DefaultTableModel model,ArrayList<Aircraft>planes ) {
+                JButton button = new JButton("Dodaj samolot");
                 button.addActionListener(e -> {
-                    String aplhabet="ABCDEFGHIJKMNLOPQRSTUVWXYZ";
+                  Vector v = new Vector();
+                  String mod=modelplane.getText();
+                  int capacity=Integer.parseInt(capacityfield.getText());
+                  int speed=Integer.parseInt(speedfield.getText());
+
+                  if(jRadioButton.isSelected()) {
+                      CargoPlane cargoPlane=new CargoPlane(mod,capacity,speed);
+                      planes.add(cargoPlane);
+                      v.add(mod);
+                      v.add("CargoPlane");
+                      v.add("  ");
+                      v.add(" ");
+                  }
+                  if(jRadioButton1.isSelected()) {
+                      PassangerPlane passangerPlane=new PassangerPlane(mod,capacity,speed);
+                      planes.add(passangerPlane);
+                      v.add(mod);
+                      v.add("PassangerPlane");
+                      v.add(" ");
+                      v.add(" ");
+                  }
+               // MyRunnable thread= new MyRunnable(textField.getText(),model);
 
 
-                    if(charindx>=25){
-                        charindx=charindx-25;
-                    }
-                    char char1=aplhabet.charAt(charindx);
-                    charindx++;
-                    num++;
-                    String s="0";
-                    MyRunnable runnable = new MyRunnable( "Wątek "+ char1,model);
-                    label.setText("Liczba wątków " + num);
-                    Vector<String> v=new Vector<>();
-                    v.add(runnable.getThreadName());
-                    v.add(s);
-                    model.addRow(v);
-                    threads.add(runnable);
+                  model.addRow(v);
                 });
                 return button;
             }
 
+
+
+
+            private  JButton getjButton1(DefaultTableModel model,ArrayList<Aircraft>planes ) {
+                JButton button = new JButton("Dodaj samolot");
+                button.addActionListener(e -> {
+                    JFrame frame1 = new JFrame("Input");
+                    frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame1.setSize(500, 500);
+                    frame1.setLayout(new BorderLayout(8, 8));
+
+                    JPanel basicPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JRadioButton jRadioButton1 = new JRadioButton("Cargo Plane");
+                    JRadioButton jRadioButton2 = new JRadioButton("PassangerPlane");
+                    ButtonGroup buttonGroup = new ButtonGroup();
+                    buttonGroup.add(jRadioButton1);
+                    buttonGroup.add(jRadioButton2);
+
+                    frame1.add(basicPanel, BorderLayout.NORTH);
+                    JTextField textField = new JTextField(15);
+                    JTextField textField1 = new JTextField(15);
+                    JTextField textField2 = new JTextField(15);
+                    JButton button1 = getjButton3(textField,textField1,textField2,jRadioButton1,jRadioButton2, model,planes);
+                    JButton button2 = getjButton2(frame1);
+                    JLabel label = new JLabel("Podaj nazwę kraju:");
+                    basicPanel.add(label);
+                    Box box = Box.createVerticalBox();
+                    box.add(button1);
+                    box.add(button2);
+                    box.add(textField);
+                    box.add(textField1);
+                    box.add(textField2);
+                    box.add(jRadioButton1);
+                    box.add(jRadioButton2);
+                    basicPanel.add(box);
+                  //  basicPanel.add(textField);
+                   // basicPanel.add(button1);
+                  //  basicPanel.add(button2);
+                   // basicPanel.add(jRadioButton1);
+                   // basicPanel.add(jRadioButton2);
+                 //   basicPanel.add(textField1);
+                  //  basicPanel.add(textField2);
+                    frame1.setVisible(true);
+                });
+                return button;
+            }
+
+            private static JButton getjButton2(JFrame frame) {
+                JButton button = new JButton("Cancel");
+                button.addActionListener(e -> frame.dispose());
+                return button;
+            }
+
+
             private void createAndShowGUI() {
-                frame = new JFrame("Aplikacja wątki");
+                frame = new JFrame("AirportApp");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(900, 600);
                 frame.setLayout(new BorderLayout(8, 8));
@@ -66,19 +130,21 @@ import java.util.concurrent.Executors;
 
                 frame.add(basicPanel, BorderLayout.EAST);
                 DefaultTableModel model = new DefaultTableModel();
-                ArrayList<MyRunnable> threads = new ArrayList<>();
+                ArrayList<Aircraft> planes = new ArrayList<>();
 
 
-                model.addColumn("Wątki");
+                model.addColumn("Model");
+                model.addColumn("Typ");
                 model.addColumn("Status");
+                model.addColumn("Akcja");
 
 
 
-                JButton btn = getjButton(model,threads);
+                JButton btn = getjButton(model,planes);
                 Box box = Box.createVerticalBox();
                 basicPanel.add(btn);
-                JLabel label = new JLabel("Liczba wątków: 0");
-                JButton btn1 = getjButton1(model, threads, label);
+                JButton btn1 = getjButton1(model,planes);
+                // JButton btn1 = getjButton1(model, threads, label);
                 box.add(btn1);
                 box.add(btn);
                 basicPanel.add(box);
@@ -92,7 +158,6 @@ import java.util.concurrent.Executors;
                 JPanel basicPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
                 frame.add(basicPanel1, BorderLayout.NORTH);
-                basicPanel1.add(label);
             }
 
             static class MyRunnable implements Runnable {
@@ -120,7 +185,7 @@ import java.util.concurrent.Executors;
                             for (int j = 0; j < model.getColumnCount(); j++) {
                                 if (model.getValueAt(i, j).equals(threadName)) {
                                     row=i;
-                                    col=j+1;
+                                    col=j+2;
                                 }
                             }
                         }
@@ -134,4 +199,5 @@ import java.util.concurrent.Executors;
                 }
             }
         }
+
 

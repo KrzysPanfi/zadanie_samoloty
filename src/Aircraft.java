@@ -10,7 +10,15 @@ public abstract class Aircraft {
        this.speed = speed;
    }
    public abstract void performFlight();
-   public abstract String toString();
+
+    @Override
+    public String toString() {
+        return "Aircraft{" +
+                "model='" + model + '\'' +
+                ", capacity=" + capacity +
+                ", speed=" + speed +
+                '}';
+    }
 
     public String getModel() {
         return model;

@@ -1,15 +1,16 @@
-public class PassangerPlane extends Aircraft {
+public class PassangerPlane extends Aircraft implements Flyable,Servicable {
     public PassangerPlane(String model, int capacity, int speed) {
         super(model, capacity, speed);
     }
 
     @Override
     public void performFlight() {
-        System.out.println("PassangerPlane performFlight");
+        System.out.println("PassangerPlane leci");
     }
-    public String toString() {
-        return getModel() + " " + getCapacity() + " " + getSpeed();
-
+    public void fly() {
+        performFlight();
     }
-
+    public void service() {
+        System.out.println("PassangerPlane service");
+    }
 }
