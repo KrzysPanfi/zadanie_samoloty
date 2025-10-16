@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -18,47 +19,64 @@ import java.util.concurrent.Executors;
                 SwingUtilities.invokeLater(() -> new Main().createAndShowGUI());
             }
 
+            Action delete = new AbstractAction()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+
+                    JTable table = (JTable)e.getSource();
+                    DefaultTableModel model= (DefaultTableModel) table.getModel();
+                    int modelRow = Integer.valueOf( e.getActionCommand() );
+                    String aircraft = (String) model.getValueAt(modelRow,0);
+                    Window window = SwingUtilities.windowForComponent(table);
+                    String s="";
+                    MyRunnable thread = new MyRunnable(aircraft,model);
+                    ExecutorService executorService = Executors.newFixedThreadPool(Integer.MAX_VALUE);
+                    executorService.execute(thread);
+
+                    }
+
+            };
 
 
-            public JButton getjButton(DefaultTableModel model,ArrayList<Aircraft>planes ) {
+
+            public JButton getjButton(DefaultTableModel model,Aircraft aircraft ) {
                 JButton button = new JButton("Uruchom wątki");
                 button.addActionListener(e -> {
-                    for(int i=0;i<planes.size();i++) {
 
                         String s="";
-                        Aircraft aircraft = planes.get(i);
                        MyRunnable thread = new MyRunnable(aircraft.getModel(),model);
-                        ExecutorService executorService = Executors.newFixedThreadPool(planes.size());
+                        ExecutorService executorService = Executors.newFixedThreadPool(Integer.MAX_VALUE);
                         executorService.execute(thread);
-                    }
+
                 });
                 return button;
             }
 
-            public JButton getjButton3(JTextField modelplane,JTextField capacityfield,JTextField speedfield,JRadioButton jRadioButton,JRadioButton jRadioButton1, DefaultTableModel model,ArrayList<Aircraft>planes ) {
+            public JButton getjButton3(JTextField modelplane,JTextField capacityfield,JTextField speedfield,JRadioButton CargoPlane,JRadioButton PassangerPlane, DefaultTableModel model,ArrayList<Aircraft>planes ) {
                 JButton button = new JButton("Dodaj samolot");
                 button.addActionListener(e -> {
-                  Vector v = new Vector();
+                  Vector <String> v = new Vector<>();
                   String mod=modelplane.getText();
                   int capacity=Integer.parseInt(capacityfield.getText());
                   int speed=Integer.parseInt(speedfield.getText());
 
-                  if(jRadioButton.isSelected()) {
+                  if(CargoPlane.isSelected()) {
                       CargoPlane cargoPlane=new CargoPlane(mod,capacity,speed);
                       planes.add(cargoPlane);
                       v.add(mod);
                       v.add("CargoPlane");
                       v.add("  ");
-                      v.add(" ");
+                      v.add(" Wystartuj ");
                       model.addRow(v);
                   }
-                  if(jRadioButton1.isSelected()) {
+                  if(PassangerPlane.isSelected()) {
                       PassangerPlane passangerPlane=new PassangerPlane(mod,capacity,speed);
                       planes.add(passangerPlane);
                       v.add(mod);
                       v.add("PassangerPlane");
                       v.add(" ");
-                      v.add(" ");
+                      v.add(" Wystartuj ");
                       model.addRow(v);
                   }
                // MyRunnable thread= new MyRunnable(textField.getText(),model);
@@ -93,16 +111,18 @@ import java.util.concurrent.Executors;
                     JTextField textField2 = new JTextField(15);
                     JButton button1 = getjButton3(textField,textField1,textField2,jRadioButton1,jRadioButton2, model,planes);
                     JButton button2 = getjButton2(frame1);
-                    JLabel label = new JLabel("Podaj nazwę kraju:");
-                    basicPanel.add(label);
+                   JLabel label = new JLabel("Podaj dane samolotu ( 1 typ, 2 pojemność, 3 prędkość): ");
+                   // basicPanel.add(label);
                     Box box = Box.createVerticalBox();
-                    box.add(button1);
-                    box.add(button2);
+                    box.add(label);
+
                     box.add(textField);
                     box.add(textField1);
                     box.add(textField2);
                     box.add(jRadioButton1);
                     box.add(jRadioButton2);
+                    box.add(button1);
+                    box.add(button2);
                     basicPanel.add(box);
                     frame1.setVisible(true);
                 });
@@ -135,17 +155,18 @@ import java.util.concurrent.Executors;
 
 
 
-                JButton btn = getjButton(model,planes);
+                //JButton btn = getjButton(model,planes);
                 Box box = Box.createVerticalBox();
-                basicPanel.add(btn);
+               // basicPanel.add(btn);
                 JButton btn1 = getjButton1(model,planes);
                 // JButton btn1 = getjButton1(model, threads, label);
                 box.add(btn1);
-                box.add(btn);
+                //box.add(btn);
                 basicPanel.add(box);
                 frame.add(basicPanel, BorderLayout.EAST);
                 JTable table = new JTable();
                 table.setModel(model);
+                ButtonColumn buttonColumn = new ButtonColumn(table, delete, 3);
                 JScrollPane tableScroll = new JScrollPane(table);
                 table.setRowHeight(100);
                 frame.add(tableScroll, BorderLayout.CENTER);
